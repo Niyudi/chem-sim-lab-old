@@ -53,9 +53,7 @@ compile_commands.json
 
 *_qmlcache.qrc
 
-**/nbproject/private/
-**/nbproject/Makefile-*.mk
-**/nbproject/Package-*.bash
+**/nbproject/
 build/
 nbbuild/
 dist/
