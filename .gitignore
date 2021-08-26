@@ -52,3 +52,12 @@ compile_commands.json
 *creator.user*
 
 *_qmlcache.qrc
+
+**/nbproject/private/
+**/nbproject/Makefile-*.mk
+**/nbproject/Package-*.bash
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
