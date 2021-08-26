@@ -59,3 +59,5 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
+
+.dep.inc
