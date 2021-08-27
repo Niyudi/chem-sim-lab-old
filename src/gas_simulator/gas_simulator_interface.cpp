@@ -8,6 +8,8 @@
 
 #include "../config.h"
 
+#include <ctime> 
+
 #include <QBrush>
 #include <QColor>
 #include <QHBoxLayout>
@@ -20,21 +22,50 @@
 // GasSimulatorRenderer
 
 GasSimulatorRenderer::GasSimulatorRenderer(QWidget *parent) : QWidget(parent) {
-    this->setContentsMargins(0, 0, 0, 0);
     this->setFixedSize(GAS_SIMULATOR_RENDERER_WIDTH, GAS_SIMULATOR_RENDERER_HEIGHT);
+    
+    srand(time(NULL));
+    
+    for (short i = 0 ; i < 100 ; ++i) {
+        ParticleImage particle = {.position = {rand() % 800, rand() % 800}, .radius = 5};
+        this->particles_list.push_back(particle);
+    }
 }
 
 void GasSimulatorRenderer::paintEvent(QPaintEvent* event) {
     Q_UNUSED(event);
     
+    // Colors
+    QColor brown(117, 75, 11);
+    QColor light_yellow(250, 250, 230);
+    
+    // Initialize painter
     QPainter painter(this);
-    QBrush brush(QColor("grey"), Qt::SolidPattern);
-    QPen pen(QColor("grey"), Qt::SolidLine);
+    QBrush brush;
+    QPen pen;
+    
+    // Paint
+    brush.setColor(light_yellow);
+    brush.setStyle(Qt::SolidPattern);
+    pen.setColor(light_yellow);
+    pen.setStyle(Qt::SolidLine);
     
     painter.setBrush(brush);
     painter.setPen(pen);
     
     painter.drawRect(0, 0, GAS_SIMULATOR_RENDERER_WIDTH - 1, GAS_SIMULATOR_RENDERER_WIDTH - 1);
+    
+    brush.setColor(brown);
+    brush.setStyle(Qt::SolidPattern);
+    pen.setColor(brown);
+    pen.setStyle(Qt::SolidLine);
+    
+    painter.setBrush(brush);
+    painter.setPen(pen);
+    
+    for (auto it = this->particles_list.begin() ; it != this->particles_list.end() ; ++it) {
+        painter.drawEllipse(it->position[0], it->position[1], it->radius, it->radius);
+    }
 }
 
 // GasSimulatorWidget
