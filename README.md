@@ -1,2 +1,2 @@
 # chem-sim-lab
-A collection of simulation for chemistry educational purposes.
+A collection of chemistry simulations for educational purposes.
