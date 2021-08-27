@@ -7,7 +7,6 @@
 #include "interface.h"
 
 #include "config.h"
-#include "gas_simulator/gas_simulator_interface.h"
 
 #include <QApplication>
 #include <QAction>
@@ -29,6 +28,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(quit, &QAction::triggered, qApp, QApplication::quit);
     
     // Central widget
-    auto *gas_simulator_widget = new GasSimulatorWidget(this);
-    setCentralWidget(gas_simulator_widget);
+    auto *widget = new QWidget(this);
+    setCentralWidget(widget);
 }
