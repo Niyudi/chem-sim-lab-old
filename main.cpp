@@ -11,6 +11,8 @@
  * Created on 26 de agosto de 2021, 15:34
  */
 
+#include "interface.h"
+
 #include <QApplication>
 #include <QMainWindow>
 
@@ -20,7 +22,7 @@ int main(int argc, char *argv[]) {
 
     QApplication app(argc, argv);
     
-    QMainWindow window;
+    MainWindow window;
     window.show();
 
     // create and show your widgets here

@@ -1,0 +1,6 @@
+- Gas simulator
+  + uni, di, and polyatomic gases
+  + Maxwell-Boltzmann distribution
+  + Emergent thermodynamic proprieties
+- 1-D Schrödinger equation simulator
+- Geometry optimizer (Van der Waals)
