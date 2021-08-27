@@ -14,9 +14,10 @@
 #ifndef GAS_SIMULATOR_INTERFACE_H
 #define GAS_SIMULATOR_INTERFACE_H
 
+#include "gas_simulator.h"
+
 #include <vector>
 
-#include <QColor>
 #include <QWidget>
 
 // Structs
@@ -31,17 +32,23 @@ struct ParticleImage {
 class GasSimulatorRenderer : public QWidget {
     Q_OBJECT
 public:
-    GasSimulatorRenderer(QWidget *parent = nullptr);
+    GasSimulatorRenderer(QWidget* parent = nullptr);
+public slots:
+    void reset();
+    void start();
+    void stop();
 protected:
     void paintEvent(QPaintEvent* event);
 private:
     std::vector<ParticleImage> particles_list;
+    
+    GasSimulator simulator();
 };
 
 class GasSimulatorWidget : public QWidget {
     Q_OBJECT
 public:
-    GasSimulatorWidget(QWidget *parent = nullptr);
+    GasSimulatorWidget(QWidget* parent = nullptr);
 private:
     void initUI();
 };

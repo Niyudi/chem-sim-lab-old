@@ -22,5 +22,7 @@ const int DEFAULT_HEIGHT = 900;
 const int GAS_SIMULATOR_RENDERER_WIDTH = 800;
 const int GAS_SIMULATOR_RENDERER_HEIGHT = 800;
 
+const short FPS = 30;
+
 #endif /* CONFIG_H */
 

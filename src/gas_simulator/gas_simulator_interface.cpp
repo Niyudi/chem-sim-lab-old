@@ -7,21 +7,27 @@
 #include "gas_simulator_interface.h"
 
 #include "../config.h"
+#include "gas_simulator.h"
 
 #include <ctime> 
 
 #include <QBrush>
 #include <QColor>
 #include <QHBoxLayout>
+#include <QObject>
 #include <QPainter>
 #include <QPen>
 #include <QPushButton>
 #include <QSizePolicy>
 #include <QVBoxLayout>
 
+/*
+ * Classes
+ */
+
 // GasSimulatorRenderer
 
-GasSimulatorRenderer::GasSimulatorRenderer(QWidget *parent) : QWidget(parent) {
+GasSimulatorRenderer::GasSimulatorRenderer(QWidget* parent) : QWidget(parent) {
     this->setFixedSize(GAS_SIMULATOR_RENDERER_WIDTH, GAS_SIMULATOR_RENDERER_HEIGHT);
     
     srand(time(NULL));
@@ -68,9 +74,19 @@ void GasSimulatorRenderer::paintEvent(QPaintEvent* event) {
     }
 }
 
+void GasSimulatorRenderer::reset() {
+    
+}
+
+void GasSimulatorRenderer::start() {
+}
+
+void GasSimulatorRenderer::stop() {
+}
+
 // GasSimulatorWidget
 
-GasSimulatorWidget::GasSimulatorWidget(QWidget *parent) : QWidget(parent) {   
+GasSimulatorWidget::GasSimulatorWidget(QWidget* parent) : QWidget(parent) {   
     this->initUI();
 }
 
@@ -81,21 +97,25 @@ void GasSimulatorWidget::initUI() {
     
     // Push buttons
     
-    auto *start_button = new QPushButton("Start simulation");
+    auto* reset_button = new QPushButton("Reset simulation");
+    auto* start_button = new QPushButton("Start simulation");
+    auto* stop_button = new QPushButton("Stop simulation");
     
     // Renderer
     
-    auto *renderer = new GasSimulatorRenderer();
+    auto* renderer = new GasSimulatorRenderer();
     
     /*
      * Layouts
      */
     
-    auto *level0_hbox0 = new QHBoxLayout(this);
+    auto* level0_hbox0 = new QHBoxLayout(this);
     level0_hbox0->setContentsMargins(0, 0, 0, 0);
     level0_hbox0->setSpacing(0);
     
-    auto *level1_vbox0 = new QVBoxLayout();
+    auto* level1_vbox0 = new QVBoxLayout();
+    
+    auto* level2_hbox0 = new QHBoxLayout();
     
     /*
      * Strucutre
@@ -104,5 +124,19 @@ void GasSimulatorWidget::initUI() {
     level0_hbox0->addLayout(level1_vbox0, 1);
     level0_hbox0->addWidget(renderer, 0);
     
-    level1_vbox0->addWidget(start_button, 0);
+    level1_vbox0->addStretch(1);
+    level1_vbox0->addWidget(reset_button, 0);
+    level1_vbox0->addLayout(level2_hbox0, 0);
+    level1_vbox0->addStretch(1);
+    
+    level2_hbox0->addWidget(start_button, 0);
+    level2_hbox0->addWidget(stop_button, 0);
+    
+    /*
+     * Signals
+     */
+    
+    QObject::connect(reset_button, &QPushButton::clicked, renderer, &GasSimulatorRenderer::reset);
+    QObject::connect(start_button, &QPushButton::clicked, renderer, &GasSimulatorRenderer::start);
+    QObject::connect(stop_button, &QPushButton::clicked, renderer, &GasSimulatorRenderer::stop);
 }

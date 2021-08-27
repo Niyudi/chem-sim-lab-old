@@ -15,20 +15,26 @@
 #include <QMenuBar>
 #include <QWidget>
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
+/*
+ * Classes
+ */
+
+// MainWindow
+
+MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     // Window
     this->resize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
     this->setWindowTitle("ChemSimLab");
     
     // Menu
-    auto *quit = new QAction("&Quit", this);
+    auto* quit = new QAction("&Quit", this);
 
-    QMenu *file = menuBar()->addMenu("&File");
+    QMenu* file = menuBar()->addMenu("&File");
     file->addAction(quit);
 
     connect(quit, &QAction::triggered, qApp, QApplication::quit);
     
     // Central widget
-    auto *gas_simulator_widget = new GasSimulatorWidget(this);
+    auto* gas_simulator_widget = new GasSimulatorWidget(this);
     setCentralWidget(gas_simulator_widget);
 }
