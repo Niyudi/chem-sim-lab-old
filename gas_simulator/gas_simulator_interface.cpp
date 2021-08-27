@@ -7,6 +7,7 @@
 #include "gas_simulator_interface.h"
 
 #include <QHBoxLayout>
+#include <QPushButton>
 #include <QVBoxLayout>
 
 // GasSimulatorWidget
@@ -20,7 +21,7 @@ void GasSimulatorWidget::initUI() {
      * Widgets
      */
     
-    
+    auto *start_button = new QPushButton("Start simulation");
     
     /*
      * Layouts
@@ -30,9 +31,13 @@ void GasSimulatorWidget::initUI() {
     level0_hbox0->setSpacing(0);
     level0_hbox0->setContentsMargins(0, 0, 0, 0);
     
+    auto *level1_vbox0 = new QVBoxLayout();
+    
     /*
      * Strucutre
      */
     
+    level0_hbox0->addLayout(level1_vbox0, 1);
     
+    level1_vbox0->addWidget(start_button, 0);
 }
