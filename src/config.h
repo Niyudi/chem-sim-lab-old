@@ -14,8 +14,13 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+// General
 const int DEFAULT_WIDTH = 1600;
 const int DEFAULT_HEIGHT = 900;
+
+//Gas Simulator
+const int GAS_SIMULATOR_RENDERER_WIDTH = 800;
+const int GAS_SIMULATOR_RENDERER_HEIGHT = 800;
 
 #endif /* CONFIG_H */
 

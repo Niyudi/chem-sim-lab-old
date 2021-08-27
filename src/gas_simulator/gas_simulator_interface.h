@@ -16,7 +16,16 @@
 
 #include <QWidget>
 
+class GasSimulatorRenderer : public QWidget {
+    Q_OBJECT
+public:
+    GasSimulatorRenderer(QWidget *parent = nullptr);
+protected:
+    void paintEvent(QPaintEvent* event);
+};
+
 class GasSimulatorWidget : public QWidget {
+    Q_OBJECT
 public:
     GasSimulatorWidget(QWidget *parent = nullptr);
 private:
