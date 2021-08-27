@@ -4,9 +4,10 @@
  * and open the template in the editor.
  */
 
-#include <interface.h>
+#include "interface.h"
 
 #include "config.h"
+#include "gas_simulator/gas_simulator_interface.h"
 
 #include <QApplication>
 #include <QAction>
@@ -28,6 +29,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(quit, &QAction::triggered, qApp, QApplication::quit);
     
     // Central widget
-    auto *temp = new QWidget(this);
-    setCentralWidget(temp);
+    auto *gas_simulator_widget = new GasSimulatorWidget(this);
+    setCentralWidget(gas_simulator_widget);
 }

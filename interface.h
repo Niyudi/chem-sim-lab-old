@@ -11,10 +11,10 @@
  * Created on 26 de agosto de 2021, 22:03
  */
 
-#include <QMainWindow>
-
 #ifndef INTERFACE_H
 #define INTERFACE_H
+
+#include <QMainWindow>
 
 class MainWindow : public QMainWindow {
 public:

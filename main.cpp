@@ -25,7 +25,5 @@ int main(int argc, char *argv[]) {
     MainWindow window;
     window.show();
 
-    // create and show your widgets here
-
     return app.exec();
 }
