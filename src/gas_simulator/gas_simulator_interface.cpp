@@ -9,7 +9,8 @@
 #include "../config.h"
 #include "gas_simulator.h"
 
-#include <ctime> 
+#include <ctime>
+#include <math.h>
 
 #include <QBrush>
 #include <QColor>
@@ -28,19 +29,13 @@
 // GasSimulatorRenderer
 
 GasSimulatorRenderer::GasSimulatorRenderer(QWidget* parent) : QWidget(parent) {
-    this->setFixedSize(GAS_SIMULATOR_RENDERER_WIDTH, GAS_SIMULATOR_RENDERER_HEIGHT);
+    this->setFixedSize((int) GAS_SIMULATOR_RENDERER_WIDTH, (int) GAS_SIMULATOR_RENDERER_HEIGHT);
     
     // Initiates gas simulator thread
     this->simulator = new GasSimulator(this);
+    connect(this->simulator, &GasSimulator::frameResults, this, &GasSimulatorRenderer::update);
     connect(this->simulator, &GasSimulator::finished, this->simulator, &QObject::deleteLater);
     this->simulator->start();
-    
-    srand(time(NULL));
-    
-    for (short i = 0 ; i < 100 ; ++i) {
-        ParticleImage particle = {.position = {rand() % 800, rand() % 800}, .radius = 5};
-        this->particles_list.push_back(particle);
-    }
 }
 
 GasSimulator* GasSimulatorRenderer::getSimulator() const {
@@ -81,6 +76,17 @@ void GasSimulatorRenderer::paintEvent(QPaintEvent* event) {
     for (auto it = this->particles_list.begin() ; it != this->particles_list.end() ; ++it) {
         painter.drawEllipse(it->position[0], it->position[1], it->radius, it->radius);
     }
+}
+
+void GasSimulatorRenderer::update(std::vector<ParticleBody>* particle_bodies_list) {
+    this->particles_list.clear();
+    
+    for (auto it = particle_bodies_list->begin() ; it != particle_bodies_list->end() ; ++it) {
+        ParticleImage particle = {.position = {(int) round(it->getPosition()[0]), (int) round(it->getPosition()[1])}, .radius = (int) round(it->getRadius())};
+        this->particles_list.push_back(particle);
+    }
+    
+    this->repaint();
 }
 
 // GasSimulatorWidget

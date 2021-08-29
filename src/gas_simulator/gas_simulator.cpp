@@ -19,7 +19,6 @@
 // GasSimulator
 
 GasSimulator::GasSimulator(QObject* parent) : QThread(parent) {
-    srand(time(NULL));
 }
 
 GasSimulator::~GasSimulator() {
@@ -29,12 +28,12 @@ GasSimulator::~GasSimulator() {
 int GasSimulator::exec() {
     while (this->active_flag) {
         if (this->reset_flag) {
+            this->particles_list.clear();
             for (short i = 0 ; i < 50 ; ++i) {
-                ParticleBody particle = ParticleBody(new double[2] { rand() / (RAND_MAX / 800.0), rand() / (RAND_MAX / 800.0)}, 5.0);
+                ParticleBody particle = ParticleBody(new double[2] { rand() / (RAND_MAX / GAS_SIMULATOR_RENDERER_WIDTH), rand() / (RAND_MAX / GAS_SIMULATOR_RENDERER_HEIGHT)}, 5.0);
                 this->particles_list.push_back(particle);
             }
             
-            std::cout << "Reset!\n";
             this->reset_flag = false;
         }
         
@@ -42,8 +41,12 @@ int GasSimulator::exec() {
             std::cout << "EXPENSIVE TASK!\n";
         }
         
-        usleep(1000000);
+        this->frameResults(&this->particles_list);
+        
+        usleep(100000);
     }
+    
+    return 0;
 }
 
 void GasSimulator::kill() {
@@ -72,4 +75,12 @@ void GasSimulator::stop() {
 ParticleBody::ParticleBody(double* position, double radius, double* velocity)
         : radius(radius), position(position), velocity(velocity) {
     
+}
+
+double ParticleBody::getRadius() const {
+    return this->radius;
+}
+
+double* ParticleBody::getPosition() const {
+    return this->position;
 }

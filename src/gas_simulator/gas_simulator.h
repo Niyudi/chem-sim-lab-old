@@ -14,6 +14,8 @@
 #ifndef GAS_SIMULATOR_H
 #define GAS_SIMULATOR_H
 
+#include "../config.h"
+
 #include <vector>
 
 #include <QThread>
@@ -39,17 +41,26 @@ protected:
     void run() override;
     
     int exec();
+signals:
+    void frameResults(std::vector<ParticleBody>* particle_bodies_list);
 private:
     std::vector<ParticleBody> particles_list;
     
     bool active_flag = true;
     bool reset_flag = true;
     bool running_flag = false;
+    
+    static constexpr float frame_time = 1.0 / FPS;
 };
 
 class ParticleBody {
 public:
     ParticleBody(double* position, double radius, double* velocity = new double[2] {0.0, 0.0});
+    
+    double getRadius() const;
+    
+    double* getPosition() const;
+    //double* getVelocity() const;
 private:
     double radius;
     

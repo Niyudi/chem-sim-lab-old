@@ -35,6 +35,8 @@ public:
     GasSimulatorRenderer(QWidget* parent = nullptr);
     
     GasSimulator* getSimulator() const;
+public slots:
+    void update(std::vector<ParticleBody>* particle_bodies_list);
 protected:
     void paintEvent(QPaintEvent* event);
 private:
