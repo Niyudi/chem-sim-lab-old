@@ -33,16 +33,14 @@ class GasSimulatorRenderer : public QWidget {
     Q_OBJECT
 public:
     GasSimulatorRenderer(QWidget* parent = nullptr);
-public slots:
-    void reset();
-    void start();
-    void stop();
+    
+    GasSimulator* getSimulator() const;
 protected:
     void paintEvent(QPaintEvent* event);
 private:
     std::vector<ParticleImage> particles_list;
     
-    GasSimulator simulator();
+    GasSimulator* simulator;
 };
 
 class GasSimulatorWidget : public QWidget {

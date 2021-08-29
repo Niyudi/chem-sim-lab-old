@@ -14,16 +14,35 @@
 #ifndef GAS_SIMULATOR_H
 #define GAS_SIMULATOR_H
 
-class GasSimulator {
+#include <vector>
+
+#include <QThread>
+
+// Forward declarations
+
+class ParticleBody;
+
+// Classes
+
+class GasSimulator : public QThread {
+    Q_OBJECT
 public:
-    GasSimulator();
+    GasSimulator(QObject* parent = nullptr);
+    ~GasSimulator();
     
+    void kill();
+public slots:
     void reset();
-    void run();
-    void start();
+    void resume();
     void stop();
+protected:   
+    void run() override;
+    
+    int exec();
 private:
-    bool active_flag = false;
+    std::vector<ParticleBody> particles_list;
+    
+    bool active_flag = true;
     bool reset_flag = true;
     bool running_flag = false;
 };

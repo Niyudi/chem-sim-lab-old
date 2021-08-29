@@ -30,12 +30,21 @@
 GasSimulatorRenderer::GasSimulatorRenderer(QWidget* parent) : QWidget(parent) {
     this->setFixedSize(GAS_SIMULATOR_RENDERER_WIDTH, GAS_SIMULATOR_RENDERER_HEIGHT);
     
+    // Initiates gas simulator thread
+    this->simulator = new GasSimulator(this);
+    connect(this->simulator, &GasSimulator::finished, this->simulator, &QObject::deleteLater);
+    this->simulator->start();
+    
     srand(time(NULL));
     
     for (short i = 0 ; i < 100 ; ++i) {
         ParticleImage particle = {.position = {rand() % 800, rand() % 800}, .radius = 5};
         this->particles_list.push_back(particle);
     }
+}
+
+GasSimulator* GasSimulatorRenderer::getSimulator() const {
+    return this->simulator;
 }
 
 void GasSimulatorRenderer::paintEvent(QPaintEvent* event) {
@@ -74,16 +83,6 @@ void GasSimulatorRenderer::paintEvent(QPaintEvent* event) {
     }
 }
 
-void GasSimulatorRenderer::reset() {
-    
-}
-
-void GasSimulatorRenderer::start() {
-}
-
-void GasSimulatorRenderer::stop() {
-}
-
 // GasSimulatorWidget
 
 GasSimulatorWidget::GasSimulatorWidget(QWidget* parent) : QWidget(parent) {   
@@ -98,7 +97,7 @@ void GasSimulatorWidget::initUI() {
     // Push buttons
     
     auto* reset_button = new QPushButton("Reset simulation");
-    auto* start_button = new QPushButton("Start simulation");
+    auto* resume_button = new QPushButton("Resume simulation");
     auto* stop_button = new QPushButton("Stop simulation");
     
     // Renderer
@@ -129,14 +128,14 @@ void GasSimulatorWidget::initUI() {
     level1_vbox0->addLayout(level2_hbox0, 0);
     level1_vbox0->addStretch(1);
     
-    level2_hbox0->addWidget(start_button, 0);
+    level2_hbox0->addWidget(resume_button, 0);
     level2_hbox0->addWidget(stop_button, 0);
     
     /*
      * Signals
      */
     
-    QObject::connect(reset_button, &QPushButton::clicked, renderer, &GasSimulatorRenderer::reset);
-    QObject::connect(start_button, &QPushButton::clicked, renderer, &GasSimulatorRenderer::start);
-    QObject::connect(stop_button, &QPushButton::clicked, renderer, &GasSimulatorRenderer::stop);
+    QObject::connect(reset_button, &QPushButton::clicked, renderer->getSimulator(), &GasSimulator::reset);
+    QObject::connect(resume_button, &QPushButton::clicked, renderer->getSimulator(), &GasSimulator::resume);
+    QObject::connect(stop_button, &QPushButton::clicked, renderer->getSimulator(), &GasSimulator::stop);
 }
