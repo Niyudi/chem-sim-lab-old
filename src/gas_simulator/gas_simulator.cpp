@@ -18,7 +18,7 @@ GasSimulator::GasSimulator() {
     
 }
 
-GasSimulator::run() {
+void GasSimulator::run() {
     this->active_flag = true;
     while (this->active_flag) {
         
