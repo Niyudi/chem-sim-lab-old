@@ -19,10 +19,10 @@ constexpr int DEFAULT_WIDTH = 1600;
 constexpr int DEFAULT_HEIGHT = 900;
 
 //Gas Simulator
-constexpr double GAS_SIMULATOR_RENDERER_WIDTH = 800;
-constexpr double GAS_SIMULATOR_RENDERER_HEIGHT = 800;
+constexpr double GAS_SIMULATOR_WIDTH = 800;
+constexpr double GAS_SIMULATOR_HEIGHT = 800;
 
-constexpr float FPS = 30.0;
+constexpr float FPS = 60.0;
 
 #endif /* CONFIG_H */
 

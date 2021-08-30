@@ -29,7 +29,7 @@
 // GasSimulatorRenderer
 
 GasSimulatorRenderer::GasSimulatorRenderer(QWidget* parent) : QWidget(parent) {
-    this->setFixedSize((int) GAS_SIMULATOR_RENDERER_WIDTH, (int) GAS_SIMULATOR_RENDERER_HEIGHT);
+    this->setFixedSize(round(GAS_SIMULATOR_WIDTH), round(GAS_SIMULATOR_HEIGHT));
     
     // Initiates gas simulator thread
     this->simulator = new GasSimulator(this);
@@ -63,7 +63,7 @@ void GasSimulatorRenderer::paintEvent(QPaintEvent* event) {
     painter.setBrush(brush);
     painter.setPen(pen);
     
-    painter.drawRect(0, 0, GAS_SIMULATOR_RENDERER_WIDTH - 1, GAS_SIMULATOR_RENDERER_WIDTH - 1);
+    painter.drawRect(0, 0, GAS_SIMULATOR_WIDTH, GAS_SIMULATOR_WIDTH);
     
     brush.setColor(brown);
     brush.setStyle(Qt::SolidPattern);
@@ -74,7 +74,7 @@ void GasSimulatorRenderer::paintEvent(QPaintEvent* event) {
     painter.setPen(pen);
     
     for (auto it = this->particles_list.begin() ; it != this->particles_list.end() ; ++it) {
-        painter.drawEllipse(it->position[0], it->position[1], it->radius, it->radius);
+        painter.drawEllipse(it->position[0], it->position[1], 2 * it->radius, 2 * it->radius);
     }
 }
 
@@ -82,7 +82,9 @@ void GasSimulatorRenderer::update(std::vector<ParticleBody>* particle_bodies_lis
     this->particles_list.clear();
     
     for (auto it = particle_bodies_list->begin() ; it != particle_bodies_list->end() ; ++it) {
-        ParticleImage particle = {.position = {(int) round(it->getPosition()[0]), (int) round(it->getPosition()[1])}, .radius = (int) round(it->getRadius())};
+        short adjusted_x = round(it->getPosition()[0] - it->getRadius());
+        short adjusted_y = round(it->getPosition()[1] - it->getRadius());
+        ParticleImage particle = {.position = {adjusted_x, adjusted_y}, .radius = round(it->getRadius())};
         this->particles_list.push_back(particle);
     }
     

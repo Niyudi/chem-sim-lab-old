@@ -50,20 +50,28 @@ private:
     bool reset_flag = true;
     bool running_flag = false;
     
-    static constexpr float frame_time = 1.0 / FPS;
+    static constexpr float FRAME_TIME = (1.0 / FPS) * 1000.0;
 };
 
 class ParticleBody {
 public:
-    ParticleBody(double* position, double radius, double* velocity = new double[2] {0.0, 0.0});
+    ParticleBody(double* position, double mass, double radius, double* velocity = new double[2] {0.0, 0.0}, double* force = new double[2] {0.0, 0.0});
     
+    void solveCollision(ParticleBody* particle, double normal_x, double normal_y, double distance);
+    void update(float time);
+    
+    double getMass() const;
     double getRadius() const;
-    
     double* getPosition() const;
-    //double* getVelocity() const;
+    double* getVelocity() const;
+    
+    //void setPosition(double* position);
+    void setVelocity(double* velocity);
 private:
+    double mass;
     double radius;
     
+    double* force;
     double* position;
     double* velocity;
 };
