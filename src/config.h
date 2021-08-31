@@ -22,7 +22,7 @@ constexpr int DEFAULT_HEIGHT = 900;
 constexpr double GAS_SIMULATOR_WIDTH = 800;
 constexpr double GAS_SIMULATOR_HEIGHT = 800;
 
-constexpr float FPS = 60.0;
+constexpr double FPS = 60.0;
 
 #endif /* CONFIG_H */
 

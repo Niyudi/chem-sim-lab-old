@@ -18,6 +18,7 @@
 
 #include <vector>
 
+#include <QPushButton>
 #include <QWidget>
 
 // Structs
@@ -51,6 +52,14 @@ public:
     GasSimulatorWidget(QWidget* parent = nullptr);
 private:
     void initUI();
+};
+
+class ToggleGasSimulatorButton : public QPushButton {
+    Q_OBJECT
+public:
+    ToggleGasSimulatorButton(QWidget* parent = nullptr);
+public slots:
+    void toggleLabel();
 };
 
 #endif /* GAS_SIMULATOR_INTERFACE_H */

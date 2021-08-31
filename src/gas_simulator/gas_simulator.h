@@ -35,8 +35,7 @@ public:
     void kill();
 public slots:
     void reset();
-    void resume();
-    void stop();
+    void toggle();
 protected:   
     void run() override;
     
@@ -50,7 +49,7 @@ private:
     bool reset_flag = true;
     bool running_flag = false;
     
-    static constexpr float FRAME_TIME = (1.0 / FPS) * 1000.0;
+    static constexpr double FRAME_TIME = (1.0 / FPS) * 1000.0;
 };
 
 class ParticleBody {
@@ -58,15 +57,15 @@ public:
     ParticleBody(double* position, double mass, double radius, double* velocity = new double[2] {0.0, 0.0}, double* force = new double[2] {0.0, 0.0});
     
     void solveCollision(ParticleBody* particle, double normal_x, double normal_y, double distance);
-    void update(float time);
+    void update(double time);
     
     double getMass() const;
     double getRadius() const;
     double* getPosition() const;
     double* getVelocity() const;
     
-    //void setPosition(double* position);
-    void setVelocity(double* velocity);
+    //void setPosition(double position_x, double position_y);
+    void setVelocity(double velocity_x, double velocity_y);
 private:
     double mass;
     double radius;

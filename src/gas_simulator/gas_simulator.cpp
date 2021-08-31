@@ -54,10 +54,8 @@ int GasSimulator::exec() {
                 for (auto it2 = std::next(it) ; it2 != this->particles_list.end() ; ++it2) {
                     // Calculates distance
                     double x = it2->getPosition()[0] - it->getPosition()[0];
-                    double x_squared = x * x;
                     double y = it2->getPosition()[1] - it->getPosition()[1];
-                    double y_squared = y * y;
-                    double distance_squared = x_squared + y_squared;
+                    double distance_squared = (x * x) + (y * y);
                     
                     //Calculates radii sum
                     double radii_sum_squared = it->getRadius() + it2->getRadius();
@@ -76,9 +74,9 @@ int GasSimulator::exec() {
         auto t2 = std::chrono::high_resolution_clock::now(); // Gets ending time
         float delta = this->FRAME_TIME - (std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() / 1000.0); // Calculates deficit in calculation time vs frame time
         
-        std::cout << "Delta: " << delta << " / " << this->FRAME_TIME << "\n";
+        std::cout << "Delta: " << delta << " / " << this->FRAME_TIME << "\n\n";
         if (delta > 0) {
-            std::this_thread::sleep_for(std::chrono::duration<float, std::ratio<1, 1000>>(delta));
+            std::this_thread::sleep_for(std::chrono::duration<double, std::ratio<1, 1000>>(delta));
         }
     }
     return 0;
@@ -93,16 +91,12 @@ void GasSimulator::reset() {
     this->reset_flag = true;
 }
 
-void GasSimulator::resume() {
-    this->running_flag = true;
+void GasSimulator::toggle() {
+    this->running_flag = !this->running_flag;
 }
 
 void GasSimulator::run() {
     this->exec();
-}
-
-void GasSimulator::stop() {
-    this->running_flag = false;
 }
 
 // ParticleBody
@@ -129,7 +123,8 @@ double* ParticleBody::getVelocity() const {
 
 void ParticleBody::solveCollision(ParticleBody* particle, double normal_x, double normal_y, double distance) {
     // Gets other particle's mass
-    double other_mass = particle->getMass();
+    double inverse_other_mass = particle->getMass();
+    double inverse_mass = this->mass;
     
     // Normalizes normal
     normal_x /= distance;
@@ -150,25 +145,20 @@ void ParticleBody::solveCollision(ParticleBody* particle, double normal_x, doubl
     
     // Calculates magnitude of impulse
     double impulse_scalar = -2 * velocity_along_normal;
-    impulse_scalar /= (1 / this->mass) + (1 / other_mass);
+    impulse_scalar /= inverse_mass + inverse_other_mass;
     
     // Calculates impulse vector (in normal variables for efficiency)
     normal_x *= impulse_scalar;
     normal_y *= impulse_scalar;
     
     // Applies impulse
-    this->velocity[0] -= (1 / this->mass) * normal_x;
-    this->velocity[1] -= (1 / this->mass) * normal_y;
-    particle->setVelocity(new double[2] {other_velocity[0] + ((1 / other_mass) * normal_x), other_velocity[0] + ((1 / other_mass) * normal_y)});
-    
-    // Adjusts position
-    //double half_distance = distance / 2;
-    this->position[0] -= normal_x * 2 * distance;
-    this->position[1] -= normal_y * 2 * distance;
+    this->velocity[0] -= inverse_mass * normal_x;
+    this->velocity[1] -= inverse_mass * normal_y;
+    particle->setVelocity(other_velocity[0] + (inverse_other_mass * normal_x), other_velocity[1] + (inverse_other_mass * normal_y));
     
 }
 
-void ParticleBody::update(float time) {
+void ParticleBody::update(double time) {
     this->position[0] += this->velocity[0] * time;
     this->position[1] += this->velocity[1] * time;
     
@@ -188,8 +178,14 @@ void ParticleBody::update(float time) {
     }
 }
 
-void ParticleBody::setVelocity(double* velocity) {
-    this->velocity[0] = velocity[0];
-    this->velocity[1] = velocity[1];
-    delete velocity;
+/*
+void ParticleBody::setPosition(double position_x, double position_y) {
+    this->position[0] = position_x;
+    this->position[1] = position_y;
+}
+*/
+
+void ParticleBody::setVelocity(double velocity_x, double velocity_y) {
+    this->velocity[0] = velocity_x;
+    this->velocity[1] = velocity_y;
 }
