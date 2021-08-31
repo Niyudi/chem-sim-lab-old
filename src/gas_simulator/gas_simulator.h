@@ -41,7 +41,7 @@ protected:
     
     int exec();
 signals:
-    void frameResults(std::vector<ParticleBody>* particle_bodies_list);
+    void particlesFrameResults(std::vector<ParticleBody>* particle_bodies_list);
 private:
     std::vector<ParticleBody> particles_list;
     

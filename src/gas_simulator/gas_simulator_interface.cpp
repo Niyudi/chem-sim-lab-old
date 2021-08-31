@@ -33,7 +33,7 @@ GasSimulatorRenderer::GasSimulatorRenderer(QWidget* parent) : QWidget(parent) {
     
     // Initiates gas simulator thread
     this->simulator = new GasSimulator(this);
-    connect(this->simulator, &GasSimulator::frameResults, this, &GasSimulatorRenderer::update);
+    connect(this->simulator, &GasSimulator::particlesFrameResults, this, &GasSimulatorRenderer::update);
     connect(this->simulator, &GasSimulator::finished, this->simulator, &QObject::deleteLater);
     this->simulator->start();
 }

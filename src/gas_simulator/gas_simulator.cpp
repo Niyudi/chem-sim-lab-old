@@ -68,7 +68,7 @@ int GasSimulator::exec() {
             }
         }
         
-        this->frameResults(&this->particles_list); // Emits results signal to renderer
+        this->particlesFrameResults(&this->particles_list); // Emits results signal to renderer
         
         
         auto t2 = std::chrono::high_resolution_clock::now(); // Gets ending time
