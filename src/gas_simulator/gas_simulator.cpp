@@ -34,10 +34,10 @@ int GasSimulator::exec() {
         
         if (this->reset_flag) { // Clears particles_list and randomizes new set of particles
             this->particles_list.clear();
-            for (short i = 0 ; i < 200 ; ++i) {
+            for (short i = 0 ; i < 500 ; ++i) {
                 double* position = new double[2] { rand() / (RAND_MAX / GAS_SIMULATOR_WIDTH), rand() / (RAND_MAX / GAS_SIMULATOR_HEIGHT)};
                 double* velocity = new double[2] { -0.1 + (rand() / (RAND_MAX / (0.2))), -0.1 + (rand() / (RAND_MAX / (0.2)))};
-                ParticleBody particle = ParticleBody(position, 1.0, 5.0, velocity);
+                ParticleBody particle = ParticleBody(position, 1.0, 3.0, velocity);
                 this->particles_list.push_back(particle);
             }
             this->reset_flag = false;
@@ -101,8 +101,12 @@ void GasSimulator::run() {
 
 // ParticleBody
 
-ParticleBody::ParticleBody(double* position, double mass, double radius, double* velocity, double* force)
-        : mass(mass), radius(radius), force(force), position(position), velocity(velocity) {
+ParticleBody::ParticleBody(double* position, double mass, double radius, double* velocity)
+        : mass(mass), radius(radius), position(position), velocity(velocity), effective_height(GAS_SIMULATOR_HEIGHT - radius), effective_width(GAS_SIMULATOR_WIDTH - radius), inverse_mass(1.0 / mass) {
+}
+
+double ParticleBody::getInverseMass() const {
+    return this->inverse_mass;
 }
 
 double ParticleBody::getMass() const {
@@ -122,16 +126,16 @@ double* ParticleBody::getVelocity() const {
 }
 
 void ParticleBody::solveCollision(ParticleBody* particle, double normal_x, double normal_y, double distance) {
-    // Gets other particle's mass
-    double inverse_other_mass = particle->getMass();
-    double inverse_mass = this->mass;
+    // Gets some data
+    double inverse_mass = this->inverse_mass;
+    double inverse_other_mass = particle->getInverseMass();
+    double* other_velocity = particle->getVelocity();
     
     // Normalizes normal
     normal_x /= distance;
     normal_y /= distance;
     
     // Calculates relative velocity
-    double* other_velocity = particle->getVelocity();
     double relative_velocity_x = other_velocity[0] - this->velocity[0];
     double relative_velocity_y = other_velocity[1] - this->velocity[1];
     
@@ -144,17 +148,16 @@ void ParticleBody::solveCollision(ParticleBody* particle, double normal_x, doubl
     }
     
     // Calculates magnitude of impulse
-    double impulse_scalar = -2 * velocity_along_normal;
-    impulse_scalar /= inverse_mass + inverse_other_mass;
+    double impulse_scalar = (-2 * velocity_along_normal) / (inverse_mass + inverse_other_mass);
     
     // Calculates impulse vector (in normal variables for efficiency)
-    normal_x *= impulse_scalar;
-    normal_y *= impulse_scalar;
+    double impulse_x = normal_x * impulse_scalar;
+    double impulse_y = normal_y * impulse_scalar;
     
     // Applies impulse
-    this->velocity[0] -= inverse_mass * normal_x;
-    this->velocity[1] -= inverse_mass * normal_y;
-    particle->setVelocity(other_velocity[0] + (inverse_other_mass * normal_x), other_velocity[1] + (inverse_other_mass * normal_y));
+    this->velocity[0] -= inverse_mass * impulse_x;
+    this->velocity[1] -= inverse_mass * impulse_y;
+    particle->setVelocity(other_velocity[0] + (inverse_other_mass * impulse_x), other_velocity[1] + (inverse_other_mass * impulse_y));
     
 }
 
@@ -162,18 +165,18 @@ void ParticleBody::update(double time) {
     this->position[0] += this->velocity[0] * time;
     this->position[1] += this->velocity[1] * time;
     
-    if (this->position[0] < 0) {
-        this->position[0] = -this->position[0];
+    if (this->position[0] < this->radius) {
+        this->position[0] = 2 * this->radius - this->position[0];
         this->velocity[0] = -this->velocity[0];
-    } else if (this->position[0] > GAS_SIMULATOR_WIDTH) {
-        this->position[0] = 2 * GAS_SIMULATOR_WIDTH - this->position[0];
+    } else if (this->position[0] > this->effective_width) {
+        this->position[0] = 2 * this->effective_width - this->position[0];
         this->velocity[0] = -this->velocity[0];
     }
-    if (this->position[1] < 0) {
-        this->position[1] = -this->position[1];
+    if (this->position[1] < this->radius) {
+        this->position[1] = 2 * this->radius - this->position[1];
         this->velocity[1] = -this->velocity[1];
-    } else if (this->position[1] > GAS_SIMULATOR_HEIGHT) {
-        this->position[1] = 2 * GAS_SIMULATOR_HEIGHT - this->position[1];
+    } else if (this->position[1] > this->effective_height) {
+        this->position[1] = 2 * this->effective_height - this->position[1];
         this->velocity[1] = -this->velocity[1];
     }
 }

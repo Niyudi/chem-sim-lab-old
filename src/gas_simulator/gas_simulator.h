@@ -54,11 +54,12 @@ private:
 
 class ParticleBody {
 public:
-    ParticleBody(double* position, double mass, double radius, double* velocity = new double[2] {0.0, 0.0}, double* force = new double[2] {0.0, 0.0});
+    ParticleBody(double* position, double mass, double radius, double* velocity = new double[2] {0.0, 0.0});
     
     void solveCollision(ParticleBody* particle, double normal_x, double normal_y, double distance);
     void update(double time);
     
+    double getInverseMass() const;
     double getMass() const;
     double getRadius() const;
     double* getPosition() const;
@@ -67,12 +68,16 @@ public:
     //void setPosition(double position_x, double position_y);
     void setVelocity(double velocity_x, double velocity_y);
 private:
-    double mass;
-    double radius;
+    const double mass;
+    const double radius;
     
-    double* force;
     double* position;
     double* velocity;
+    
+    // Calculation aid variables
+    const double effective_height;
+    const double effective_width;
+    const double inverse_mass;
 };
 
 #endif /* GAS_SIMULATOR_H */

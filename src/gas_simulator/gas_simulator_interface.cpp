@@ -105,7 +105,7 @@ void GasSimulatorWidget::initUI() {
     // Push buttons
     
     auto* reset_button = new QPushButton("Reset simulation");
-    auto* resume_button = new ToggleGasSimulatorButton();
+    auto* toggle_button = new ToggleGasSimulatorButton();
     
     // Renderer
     
@@ -131,25 +131,25 @@ void GasSimulatorWidget::initUI() {
     level0_hbox0->addWidget(renderer, 0);
     
     level1_vbox0->addStretch(1);
-    level1_vbox0->addWidget(reset_button, 0);
     level1_vbox0->addLayout(level2_hbox0, 0);
     level1_vbox0->addStretch(1);
     
-    level2_hbox0->addWidget(resume_button, 0);
+    level2_hbox0->addWidget(toggle_button, 0);
+    level2_hbox0->addWidget(reset_button, 0);
     
     /*
      * Signals
      */
     
     QObject::connect(reset_button, &QPushButton::clicked, renderer->getSimulator(), &GasSimulator::reset);
-    QObject::connect(resume_button, &QPushButton::clicked, renderer->getSimulator(), &GasSimulator::toggle);
+    QObject::connect(toggle_button, &ToggleGasSimulatorButton::clicked, renderer->getSimulator(), &GasSimulator::toggle);
 }
 
 // ToggleGasSimulatorButton
 
 ToggleGasSimulatorButton::ToggleGasSimulatorButton(QWidget* parent) : QPushButton(parent) {
     this->setText("Resume simulation");
-    connect(this, &QPushButton::clicked, this, &ToggleGasSimulatorButton::toggleLabel);
+    connect(this, &ToggleGasSimulatorButton::clicked, this, &ToggleGasSimulatorButton::toggleLabel);
 }
 
 void ToggleGasSimulatorButton::toggleLabel() {
