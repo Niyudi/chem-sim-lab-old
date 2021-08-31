@@ -12,8 +12,8 @@
 #include <stdlib.h>
 #include <thread>
 
+// Debugger :)
 #include <iostream>
-#include <unistd.h>
 
 /*
  * Classes
@@ -40,13 +40,17 @@ int GasSimulator::exec() {
                 ParticleBody particle = ParticleBody(position, 1.0, 3.0, velocity);
                 this->particles_list.push_back(particle);
             }
+            
+            this->acumulated_frame_time = 0.0;
+            this->frame_count = 1;
+            
             this->reset_flag = false;
         }
         
         if (this->running_flag) { // Calculates physics for one frame
             // Updates all positions based on velocities for one frame
             for (auto it = this->particles_list.begin() ; it != this->particles_list.end() ; ++it) {
-                it->update(this->FRAME_TIME);
+                it->update(this->MAX_FRAME_TIME);
             }
             
             // Detects and resolves collisions
@@ -66,16 +70,23 @@ int GasSimulator::exec() {
                     }
                 }
             }
+            
+            ++this->frame_count;
         }
         
         this->particlesFrameResults(&this->particles_list); // Emits results signal to renderer
         
-        
         auto t2 = std::chrono::high_resolution_clock::now(); // Gets ending time
-        float delta = this->FRAME_TIME - (std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() / 1000.0); // Calculates deficit in calculation time vs frame time
+        double frame_time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() / 1000.0; // Calculates frame time in milliseconds
         
-        std::cout << "Delta: " << delta << " / " << this->FRAME_TIME << "\n\n";
-        if (delta > 0) {
+        this->acumulated_frame_time += frame_time;
+        if (this->frame_count % 60 == 0) {
+            this->frameTimeData(this->acumulated_frame_time / 60.0, this->MAX_FRAME_TIME); // Emits frame time data signal to widget
+            this->acumulated_frame_time = 0.0;
+        }
+        
+        float delta = this->MAX_FRAME_TIME - frame_time; // Calculates difference between max frame time vs frame time
+        if (delta > 0) { // Sleeps for excess time
             std::this_thread::sleep_for(std::chrono::duration<double, std::ratio<1, 1000>>(delta));
         }
     }

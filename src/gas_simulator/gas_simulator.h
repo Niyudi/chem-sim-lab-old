@@ -41,6 +41,7 @@ protected:
     
     int exec();
 signals:
+    void frameTimeData(double frame_time, double max_frame_time);
     void particlesFrameResults(std::vector<ParticleBody>* particle_bodies_list);
 private:
     std::vector<ParticleBody> particles_list;
@@ -49,7 +50,11 @@ private:
     bool reset_flag = true;
     bool running_flag = false;
     
-    static constexpr double FRAME_TIME = (1.0 / FPS) * 1000.0;
+    double acumulated_frame_time = 0.0;
+    
+    unsigned long frame_count = 1;
+    
+    static constexpr double MAX_FRAME_TIME = (1.0 / FPS) * 1000.0;
 };
 
 class ParticleBody {

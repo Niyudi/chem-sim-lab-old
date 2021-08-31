@@ -18,6 +18,7 @@
 
 #include <vector>
 
+#include <QLabel>
 #include <QPushButton>
 #include <QWidget>
 
@@ -50,16 +51,14 @@ class GasSimulatorWidget : public QWidget {
     Q_OBJECT
 public:
     GasSimulatorWidget(QWidget* parent = nullptr);
+public slots:
+    void toggleGasSimulatorButtonLabel();
+    void updateFrameTimeLabel(double frame_time, double max_frame_time);
 private:
     void initUI();
-};
-
-class ToggleGasSimulatorButton : public QPushButton {
-    Q_OBJECT
-public:
-    ToggleGasSimulatorButton(QWidget* parent = nullptr);
-public slots:
-    void toggleLabel();
+    
+    QLabel* frame_time_label;
+    QPushButton* toggle_button;
 };
 
 #endif /* GAS_SIMULATOR_INTERFACE_H */

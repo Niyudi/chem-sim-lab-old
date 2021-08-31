@@ -11,15 +11,19 @@
 
 #include <ctime>
 #include <math.h>
+#include <sstream>
+#include <string>
 
 #include <QBrush>
 #include <QColor>
 #include <QHBoxLayout>
+#include <QLabel>
 #include <QObject>
 #include <QPainter>
 #include <QPen>
 #include <QPushButton>
 #include <QSizePolicy>
+#include <QString>
 #include <QVBoxLayout>
 
 /*
@@ -34,6 +38,7 @@ GasSimulatorRenderer::GasSimulatorRenderer(QWidget* parent) : QWidget(parent) {
     // Initiates gas simulator thread
     this->simulator = new GasSimulator(this);
     connect(this->simulator, &GasSimulator::particlesFrameResults, this, &GasSimulatorRenderer::update);
+    connect(this->simulator, &GasSimulator::frameTimeData, (GasSimulatorWidget*) parent, &GasSimulatorWidget::updateFrameTimeLabel);
     connect(this->simulator, &GasSimulator::finished, this->simulator, &QObject::deleteLater);
     this->simulator->start();
 }
@@ -102,14 +107,18 @@ void GasSimulatorWidget::initUI() {
      * Widgets
      */
     
+    // Labels
+    
+    this->frame_time_label = new QLabel("Frame time: 0.000ms/0.000ms (0.0%)");
+    
     // Push buttons
     
     auto* reset_button = new QPushButton("Reset simulation");
-    auto* toggle_button = new ToggleGasSimulatorButton();
+    this->toggle_button = new QPushButton("Resume simulation");
     
     // Renderer
     
-    auto* renderer = new GasSimulatorRenderer();
+    auto* renderer = new GasSimulatorRenderer(this);
     
     /*
      * Layouts
@@ -132,9 +141,10 @@ void GasSimulatorWidget::initUI() {
     
     level1_vbox0->addStretch(1);
     level1_vbox0->addLayout(level2_hbox0, 0);
+    level1_vbox0->addWidget(this->frame_time_label, 0);
     level1_vbox0->addStretch(1);
     
-    level2_hbox0->addWidget(toggle_button, 0);
+    level2_hbox0->addWidget(this->toggle_button, 0);
     level2_hbox0->addWidget(reset_button, 0);
     
     /*
@@ -142,20 +152,28 @@ void GasSimulatorWidget::initUI() {
      */
     
     QObject::connect(reset_button, &QPushButton::clicked, renderer->getSimulator(), &GasSimulator::reset);
-    QObject::connect(toggle_button, &ToggleGasSimulatorButton::clicked, renderer->getSimulator(), &GasSimulator::toggle);
+    QObject::connect(this->toggle_button, &QPushButton::clicked, this, &GasSimulatorWidget::toggleGasSimulatorButtonLabel);
+    QObject::connect(this->toggle_button, &QPushButton::clicked, renderer->getSimulator(), &GasSimulator::toggle);
 }
 
-// ToggleGasSimulatorButton
-
-ToggleGasSimulatorButton::ToggleGasSimulatorButton(QWidget* parent) : QPushButton(parent) {
-    this->setText("Resume simulation");
-    connect(this, &ToggleGasSimulatorButton::clicked, this, &ToggleGasSimulatorButton::toggleLabel);
-}
-
-void ToggleGasSimulatorButton::toggleLabel() {
-    if (this->text() == "Resume simulation") {
-        this->setText("Stop simulation");
+void GasSimulatorWidget::toggleGasSimulatorButtonLabel() {   
+    if (this->toggle_button->text() == "Resume simulation") {
+        this->toggle_button->setText("Stop simulation");
     } else {
-        this->setText("Resume simulation");
+        this->toggle_button->setText("Resume simulation");
     }
+}
+
+void GasSimulatorWidget::updateFrameTimeLabel(double frame_time, double max_frame_time) {
+    double time_usage = frame_time / max_frame_time * 100;
+    
+    std::ostringstream frame_time_stream, max_frame_time_stream, time_usage_stream;
+    frame_time_stream.precision(3);
+    max_frame_time_stream.precision(3);
+    time_usage_stream.precision(1);
+    frame_time_stream << std::fixed << frame_time;
+    max_frame_time_stream << std::fixed << max_frame_time;
+    time_usage_stream << std::fixed << time_usage;
+    
+    this->frame_time_label->setText(QString::fromStdString("Frame time: " + frame_time_stream.str() + "ms/" + max_frame_time_stream.str() + "ms (" + time_usage_stream.str() + "%)"));
 }
