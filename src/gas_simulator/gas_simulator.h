@@ -1,16 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/* 
- * File:   gas_simulator.h
- * Author: niyudi
- *
- * Created on 27 de agosto de 2021, 16:22
- */
-
 #ifndef GAS_SIMULATOR_H
 #define GAS_SIMULATOR_H
 
@@ -34,7 +21,7 @@ public:
     
     void kill();
 public slots:
-    void reset();
+    void reset(int particle_number);
     void toggle();
 protected:   
     void run() override;
@@ -42,9 +29,11 @@ protected:
     int exec();
 signals:
     void frameTimeData(double frame_time, double max_frame_time);
-    void particlesFrameResults(std::vector<ParticleBody>* particle_bodies_list);
+    void particlesFrameResults(ParticleBody** particle_bodies_list, int particle_number);
 private:
-    std::vector<ParticleBody> particles_list;
+    int particle_number = 500;
+    int new_particle_number = 500;
+    ParticleBody** particles_list = new ParticleBody* [500];
     
     bool active_flag = true;
     bool reset_flag = true;
@@ -60,6 +49,7 @@ private:
 class ParticleBody {
 public:
     ParticleBody(double* position, double mass, double radius, double* velocity = new double[2] {0.0, 0.0});
+    ~ParticleBody();
     
     void solveCollision(ParticleBody* particle, double normal_x, double normal_y, double distance);
     void update(double time);

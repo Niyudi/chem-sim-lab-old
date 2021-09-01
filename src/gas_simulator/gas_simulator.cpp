@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 #include "gas_simulator.h"
 
 #include <chrono>
@@ -32,13 +26,16 @@ int GasSimulator::exec() {
     while (this->active_flag) {
         auto t1 = std::chrono::high_resolution_clock::now(); // Gets starting time
         
-        if (this->reset_flag) { // Clears particles_list and randomizes new set of particles
-            this->particles_list.clear();
-            for (short i = 0 ; i < 700 ; ++i) {
+        if (this->reset_flag) { // Randomizes new particles_list
+            this->particle_number = this->new_particle_number;
+            
+            delete this->particles_list;
+            this->particles_list = new ParticleBody* [this->particle_number];
+            
+            for (short i = 0 ; i < this->particle_number ; ++i) {
                 double* position = new double[2] { rand() / (RAND_MAX / GAS_SIMULATOR_WIDTH), rand() / (RAND_MAX / GAS_SIMULATOR_HEIGHT)};
                 double* velocity = new double[2] { -0.1 + (rand() / (RAND_MAX / (0.2))), -0.1 + (rand() / (RAND_MAX / (0.2)))};
-                ParticleBody particle = ParticleBody(position, 1.43, 3.0, velocity);
-                this->particles_list.push_back(particle);
+                this->particles_list[i] = new ParticleBody(position, 1.43, 3.0, velocity);
             }
             
             this->acumulated_frame_time = 0.0;
@@ -49,24 +46,25 @@ int GasSimulator::exec() {
         
         if (this->running_flag) { // Calculates physics for one frame
             // Updates all positions based on velocities for one frame
-            for (auto it = this->particles_list.begin() ; it != this->particles_list.end() ; ++it) {
-                it->update(this->MAX_FRAME_TIME);
+            for (short i = 0 ; i < this->particle_number ; ++i) {
+                this->particles_list[i]->update(this->MAX_FRAME_TIME);
             }
             
             // Detects and resolves collisions
-            for (auto it = this->particles_list.begin() ; it != --this->particles_list.end() ; ++it) {
-                for (auto it2 = std::next(it) ; it2 != this->particles_list.end() ; ++it2) {
+            
+            for (short i1 = 0 ; i1 < this->particle_number - 1 ; ++i1) {
+                for (short i2 = i1 + 1 ; i2 < this->particle_number ; ++i2) {
                     // Calculates distance
-                    double x = it2->getPosition()[0] - it->getPosition()[0];
-                    double y = it2->getPosition()[1] - it->getPosition()[1];
+                    double x = this->particles_list[i2]->getPosition()[0] - this->particles_list[i1]->getPosition()[0];
+                    double y = this->particles_list[i2]->getPosition()[1] - this->particles_list[i1]->getPosition()[1];
                     double distance_squared = (x * x) + (y * y);
                     
                     //Calculates radii sum
-                    double radii_sum_squared = it->getRadius() + it2->getRadius();
+                    double radii_sum_squared = this->particles_list[i1]->getRadius() + this->particles_list[i2]->getRadius();
                     radii_sum_squared *= radii_sum_squared;
                     
                     if (distance_squared < radii_sum_squared) {
-                        it->solveCollision(&(*it2), x, y, sqrt(distance_squared));
+                        this->particles_list[i1]->solveCollision(this->particles_list[i2], x, y, sqrt(distance_squared));
                     }
                 }
             }
@@ -74,7 +72,7 @@ int GasSimulator::exec() {
             ++this->frame_count;
         }
         
-        this->particlesFrameResults(&this->particles_list); // Emits results signal to renderer
+        this->particlesFrameResults(this->particles_list, this->particle_number); // Emits results signal to renderer
         
         auto t2 = std::chrono::high_resolution_clock::now(); // Gets ending time
         double frame_time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() / 1000.0; // Calculates frame time in milliseconds
@@ -98,7 +96,9 @@ void GasSimulator::kill() {
     this->wait();
 }
 
-void GasSimulator::reset() {
+void GasSimulator::reset(int particle_number) {
+    this->new_particle_number = particle_number; // Changes particle number
+    
     this->reset_flag = true;
 }
 
@@ -114,6 +114,11 @@ void GasSimulator::run() {
 
 ParticleBody::ParticleBody(double* position, double mass, double radius, double* velocity)
         : mass(mass), radius(radius), position(position), velocity(velocity), effective_height(GAS_SIMULATOR_HEIGHT - radius), effective_width(GAS_SIMULATOR_WIDTH - radius), inverse_mass(1.0 / mass) {
+}
+
+ParticleBody::~ParticleBody() {
+    delete this->position;
+    delete this->velocity;
 }
 
 double ParticleBody::getInverseMass() const {

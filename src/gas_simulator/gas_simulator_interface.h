@@ -1,16 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/* 
- * File:   gas_simulator_interface.h
- * Author: niyudi
- *
- * Created on 26 de agosto de 2021, 22:22
- */
-
 #ifndef GAS_SIMULATOR_INTERFACE_H
 #define GAS_SIMULATOR_INTERFACE_H
 
@@ -40,7 +27,7 @@ public:
     
     GasSimulator* getSimulator() const;
 public slots:
-    void update(std::vector<ParticleBody>* particle_bodies_list);
+    void update(ParticleBody** particle_bodies_list, int particle_number);
 protected:
     void paintEvent(QPaintEvent* event);
 private:
@@ -56,8 +43,11 @@ public:
 public slots:
     void adjustParticleNumberLineEdit();
     void adjustParticleNumberSlider();
+    void gatherResetData();
     void toggleGasSimulatorButtonLabel();
     void updateFrameTimeLabel(double frame_time, double max_frame_time);
+signals:
+    void sendResetData(int particle_number);
 private:
     void initUI();
     

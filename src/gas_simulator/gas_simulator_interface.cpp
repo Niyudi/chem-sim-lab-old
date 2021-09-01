@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 #include "gas_simulator_interface.h"
 
 #include "../config.h"
@@ -88,13 +82,13 @@ void GasSimulatorRenderer::paintEvent(QPaintEvent* event) {
     }
 }
 
-void GasSimulatorRenderer::update(std::vector<ParticleBody>* particle_bodies_list) {
+void GasSimulatorRenderer::update(ParticleBody** particle_bodies_list, int particle_number) {
     this->particles_list.clear();
     
-    for (auto it = particle_bodies_list->begin() ; it != particle_bodies_list->end() ; ++it) {
-        short adjusted_x = round(it->getPosition()[0] - it->getRadius());
-        short adjusted_y = round(it->getPosition()[1] - it->getRadius());
-        ParticleImage particle = {.position = {adjusted_x, adjusted_y}, .radius = round(it->getRadius())};
+    for (short i = 0 ; i < particle_number ; ++i) {
+        short adjusted_x = round(particle_bodies_list[i]->getPosition()[0] - particle_bodies_list[i]->getRadius());
+        short adjusted_y = round(particle_bodies_list[i]->getPosition()[1] - particle_bodies_list[i]->getRadius());
+        ParticleImage particle = {.position = {adjusted_x, adjusted_y}, .radius = round(particle_bodies_list[i]->getRadius())};
         this->particles_list.push_back(particle);
     }
     
@@ -114,6 +108,10 @@ void GasSimulatorWidget::adjustParticleNumberLineEdit() {
 
 void GasSimulatorWidget::adjustParticleNumberSlider() {   
     this->particle_number_slider->setSliderPosition(this->particle_number_line_edit->text().toInt());
+}
+
+void GasSimulatorWidget::gatherResetData() {
+    this->sendResetData(this->particle_number_slider->value());
 }
 
 void GasSimulatorWidget::initUI() {
@@ -188,9 +186,11 @@ void GasSimulatorWidget::initUI() {
     QObject::connect(this->particle_number_line_edit, &QLineEdit::editingFinished, this, &GasSimulatorWidget::adjustParticleNumberSlider);
     QObject::connect(this->particle_number_slider, &QSlider::valueChanged, this, &GasSimulatorWidget::adjustParticleNumberLineEdit);
     
-    QObject::connect(reset_button, &QPushButton::clicked, renderer->getSimulator(), &GasSimulator::reset);
+    QObject::connect(reset_button, &QPushButton::clicked, this, &GasSimulatorWidget::gatherResetData);
     QObject::connect(this->toggle_button, &QPushButton::clicked, this, &GasSimulatorWidget::toggleGasSimulatorButtonLabel);
     QObject::connect(this->toggle_button, &QPushButton::clicked, renderer->getSimulator(), &GasSimulator::toggle);
+    
+    QObject::connect(this, &GasSimulatorWidget::sendResetData, renderer->getSimulator(), &GasSimulator::reset);
 }
 
 void GasSimulatorWidget::toggleGasSimulatorButtonLabel() {   
