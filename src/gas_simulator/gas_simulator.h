@@ -19,7 +19,7 @@ public:
     
     void kill();
 public slots:
-    void reset(int particle_number);
+    void reset(int particle_number, double radius);
     void toggle();
 protected:   
     void run() override;
@@ -32,6 +32,8 @@ signals:
 private:
     int particle_number = 500;
     ParticleBody** particles_list = new ParticleBody* [500];
+    
+    double radius = 3.0;
     
     // Thread safe holder variables
     int new_particle_number = 500;

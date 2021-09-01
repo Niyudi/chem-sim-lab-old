@@ -9,6 +9,7 @@
 #include <string>
 
 #include <QBrush>
+#include <QChar>
 #include <QColor>
 #include <QHBoxLayout>
 #include <QIntValidator>
@@ -22,6 +23,9 @@
 #include <QSlider>
 #include <QString>
 #include <QVBoxLayout>
+
+// Debugger :)
+#include <iostream>
 
 /*
  * Classes
@@ -109,16 +113,23 @@ GasSimulatorWidget::GasSimulatorWidget(QWidget* parent) : QWidget(parent) {
 }
 
 void GasSimulatorWidget::adjustParticleNumberLineEdit() {
-    this->particle_number_line_edit->clear();
-    this->particle_number_line_edit->insert(QString::number(this->particle_number_slider->value()));
+    this->particle_number_line_edit->setText(QString::number(this->particle_number_slider->value()));
 }
 
 void GasSimulatorWidget::adjustParticleNumberSlider() {   
-    this->particle_number_slider->setSliderPosition(this->particle_number_line_edit->text().toInt());
+    this->particle_number_slider->setValue(this->particle_number_line_edit->text().toInt());
+}
+
+void GasSimulatorWidget::adjustRadiusLineEdit() {
+    this->radius_line_edit->setText(QString::number(this->radius_slider->value()));
+}
+
+void GasSimulatorWidget::adjustRadiusSlider() {
+    this->radius_slider->setValue(this->radius_line_edit->text().toInt());
 }
 
 void GasSimulatorWidget::gatherResetData() {
-    this->sendResetData(this->particle_number_slider->value());
+    this->sendResetData(this->particle_number_slider->value(), this->radius_slider->value() / 100.0);
 }
 
 void GasSimulatorWidget::initUI() {
@@ -129,13 +140,21 @@ void GasSimulatorWidget::initUI() {
     // Labels
     
     this->frame_time_label = new QLabel("Frame time: 0.000ms/0.000ms (0.0%)", this);
+    
     auto* particle_number_label = new QLabel("Particle number:", this);
+    auto* radius_label = new QLabel("Radius:", this);
     
     // Line edits
     
     this->particle_number_line_edit = new QLineEdit("500", this);
-    this->particle_number_line_edit->setFixedWidth(50);
     this->particle_number_line_edit->setValidator(new QIntValidator(1, 1000, this));
+    this->particle_number_line_edit->setAlignment(Qt::AlignRight);
+    this->particle_number_line_edit->setFixedWidth(50);
+    
+    this->radius_line_edit = new QLineEdit("300", this);
+    this->radius_line_edit->setValidator(new QIntValidator(100, 1000, this));
+    this->radius_line_edit->setAlignment(Qt::AlignRight);
+    this->radius_line_edit->setFixedWidth(50);
     
     // Push buttons
     
@@ -153,6 +172,11 @@ void GasSimulatorWidget::initUI() {
     this->particle_number_slider->setRange(1, 1000);
     this->particle_number_slider->setValue(500);
     
+    this->radius_slider = new QSlider(Qt::Horizontal, this);
+    this->radius_slider->setTracking(true);
+    this->radius_slider->setRange(100, 1000);
+    this->radius_slider->setValue(300);
+    
     /*
      * Layouts
      */
@@ -165,6 +189,7 @@ void GasSimulatorWidget::initUI() {
     
     auto* level2_hbox0 = new QHBoxLayout();
     auto* level2_hbox1 = new QHBoxLayout();
+    auto* level2_hbox2 = new QHBoxLayout();
     
     /*
      * Strucutre
@@ -176,6 +201,7 @@ void GasSimulatorWidget::initUI() {
     level1_vbox0->addStretch(1);
     level1_vbox0->addLayout(level2_hbox0, 0);
     level1_vbox0->addLayout(level2_hbox1, 0);
+    level1_vbox0->addLayout(level2_hbox2, 0);
     level1_vbox0->addWidget(this->frame_time_label, 0);
     level1_vbox0->addStretch(1);
     
@@ -183,8 +209,12 @@ void GasSimulatorWidget::initUI() {
     level2_hbox0->addWidget(this->particle_number_slider, 1);
     level2_hbox0->addWidget(this->particle_number_line_edit, 0);
     
-    level2_hbox1->addWidget(this->toggle_button, 0);
-    level2_hbox1->addWidget(reset_button, 0);
+    level2_hbox1->addWidget(radius_label, 0);
+    level2_hbox1->addWidget(this->radius_slider, 1);
+    level2_hbox1->addWidget(this->radius_line_edit, 0);
+    
+    level2_hbox2->addWidget(this->toggle_button, 0);
+    level2_hbox2->addWidget(reset_button, 0);
     
     /*
      * Signals
@@ -192,6 +222,9 @@ void GasSimulatorWidget::initUI() {
     
     QObject::connect(this->particle_number_line_edit, &QLineEdit::editingFinished, this, &GasSimulatorWidget::adjustParticleNumberSlider);
     QObject::connect(this->particle_number_slider, &QSlider::valueChanged, this, &GasSimulatorWidget::adjustParticleNumberLineEdit);
+    
+    QObject::connect(this->radius_line_edit, &QLineEdit::editingFinished, this, &GasSimulatorWidget::adjustRadiusSlider);
+    QObject::connect(this->radius_slider, &QSlider::valueChanged, this, &GasSimulatorWidget::adjustRadiusLineEdit);
     
     QObject::connect(reset_button, &QPushButton::clicked, this, &GasSimulatorWidget::gatherResetData);
     QObject::connect(this->toggle_button, &QPushButton::clicked, this, &GasSimulatorWidget::toggleGasSimulatorButtonLabel);

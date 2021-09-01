@@ -3,8 +3,6 @@
 
 #include "gas_simulator.h"
 
-#include <vector>
-
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
@@ -46,18 +44,25 @@ public:
 public slots:
     void adjustParticleNumberLineEdit();
     void adjustParticleNumberSlider();
+    void adjustRadiusLineEdit();
+    void adjustRadiusSlider();
     void gatherResetData();
     void toggleGasSimulatorButtonLabel();
     void updateFrameTimeLabel(double frame_time, double max_frame_time);
 signals:
-    void sendResetData(int particle_number);
+    void sendResetData(int particle_number, double radius);
 private:
     void initUI();
     
     QLabel* frame_time_label;
+    
     QLineEdit* particle_number_line_edit;
+    QLineEdit* radius_line_edit;
+    
     QPushButton* toggle_button;
+    
     QSlider* particle_number_slider;
+    QSlider* radius_slider;
 };
 
 #endif /* GAS_SIMULATOR_INTERFACE_H */

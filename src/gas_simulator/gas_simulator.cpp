@@ -28,7 +28,7 @@ int GasSimulator::exec() {
         
         if (this->reset_flag) { // Randomizes new particles_list
             this->particle_number = this->new_particle_number;
-            this->setRendererParticleNumber(this->particle_number);
+            this->setRendererParticleNumber(this->new_particle_number);
             
             delete this->particles_list;
             this->particles_list = new ParticleBody* [this->particle_number];
@@ -36,7 +36,7 @@ int GasSimulator::exec() {
             for (short i = 0 ; i < this->particle_number ; ++i) {
                 double* position = new double[2] { rand() / (RAND_MAX / GAS_SIMULATOR_WIDTH), rand() / (RAND_MAX / GAS_SIMULATOR_HEIGHT)};
                 double* velocity = new double[2] { -0.1 + (rand() / (RAND_MAX / (0.2))), -0.1 + (rand() / (RAND_MAX / (0.2)))};
-                this->particles_list[i] = new ParticleBody(position, 1.43, 3.0, velocity);
+                this->particles_list[i] = new ParticleBody(position, 1.43, this->radius, velocity);
             }
             
             this->acumulated_frame_time = 0.0;
@@ -78,8 +78,8 @@ int GasSimulator::exec() {
         double frame_time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() / 1000.0; // Calculates frame time in milliseconds
         
         this->acumulated_frame_time += frame_time;
-        if (this->frame_count % 60 == 0) {
-            this->frameTimeData(this->acumulated_frame_time / 60.0, this->MAX_FRAME_TIME); // Emits frame time data signal to widget
+        if (this->frame_count % 50 == 0) {
+            this->frameTimeData(this->acumulated_frame_time / 50.0, this->MAX_FRAME_TIME); // Emits frame time data signal to widget
             this->acumulated_frame_time = 0.0;
         }
         
@@ -96,8 +96,9 @@ void GasSimulator::kill() {
     this->wait();
 }
 
-void GasSimulator::reset(int particle_number) {
+void GasSimulator::reset(int particle_number, double radius) {
     this->new_particle_number = particle_number; // Changes particle number
+    this->radius = radius; // Changes particle number
     
     this->reset_flag = true;
 }
