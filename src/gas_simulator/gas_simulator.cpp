@@ -34,10 +34,10 @@ int GasSimulator::exec() {
         
         if (this->reset_flag) { // Clears particles_list and randomizes new set of particles
             this->particles_list.clear();
-            for (short i = 0 ; i < 500 ; ++i) {
+            for (short i = 0 ; i < 700 ; ++i) {
                 double* position = new double[2] { rand() / (RAND_MAX / GAS_SIMULATOR_WIDTH), rand() / (RAND_MAX / GAS_SIMULATOR_HEIGHT)};
                 double* velocity = new double[2] { -0.1 + (rand() / (RAND_MAX / (0.2))), -0.1 + (rand() / (RAND_MAX / (0.2)))};
-                ParticleBody particle = ParticleBody(position, 1.0, 3.0, velocity);
+                ParticleBody particle = ParticleBody(position, 1.43, 3.0, velocity);
                 this->particles_list.push_back(particle);
             }
             

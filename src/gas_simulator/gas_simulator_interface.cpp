@@ -17,12 +17,15 @@
 #include <QBrush>
 #include <QColor>
 #include <QHBoxLayout>
+#include <QIntValidator>
 #include <QLabel>
+#include <QLineEdit>
 #include <QObject>
 #include <QPainter>
 #include <QPen>
 #include <QPushButton>
 #include <QSizePolicy>
+#include <QSlider>
 #include <QString>
 #include <QVBoxLayout>
 
@@ -37,9 +40,9 @@ GasSimulatorRenderer::GasSimulatorRenderer(QWidget* parent) : QWidget(parent) {
     
     // Initiates gas simulator thread
     this->simulator = new GasSimulator(this);
-    connect(this->simulator, &GasSimulator::particlesFrameResults, this, &GasSimulatorRenderer::update);
-    connect(this->simulator, &GasSimulator::frameTimeData, (GasSimulatorWidget*) parent, &GasSimulatorWidget::updateFrameTimeLabel);
-    connect(this->simulator, &GasSimulator::finished, this->simulator, &QObject::deleteLater);
+    QObject::connect(this->simulator, &GasSimulator::particlesFrameResults, this, &GasSimulatorRenderer::update);
+    QObject::connect(this->simulator, &GasSimulator::frameTimeData, (GasSimulatorWidget*) parent, &GasSimulatorWidget::updateFrameTimeLabel);
+    QObject::connect(this->simulator, &GasSimulator::finished, this->simulator, &QObject::deleteLater);
     this->simulator->start();
 }
 
@@ -53,6 +56,8 @@ void GasSimulatorRenderer::paintEvent(QPaintEvent* event) {
     // Colors
     QColor brown(117, 75, 11);
     QColor light_yellow(250, 250, 230);
+    //QColor grey(215, 215, 215);
+    //QColor blue(5, 38, 252);
     
     // Initialize painter
     QPainter painter(this);
@@ -102,6 +107,15 @@ GasSimulatorWidget::GasSimulatorWidget(QWidget* parent) : QWidget(parent) {
     this->initUI();
 }
 
+void GasSimulatorWidget::adjustParticleNumberLineEdit() {
+    this->particle_number_line_edit->clear();
+    this->particle_number_line_edit->insert(QString::number(this->particle_number_slider->value()));
+}
+
+void GasSimulatorWidget::adjustParticleNumberSlider() {   
+    this->particle_number_slider->setSliderPosition(this->particle_number_line_edit->text().toInt());
+}
+
 void GasSimulatorWidget::initUI() {
     /*
      * Widgets
@@ -109,16 +123,30 @@ void GasSimulatorWidget::initUI() {
     
     // Labels
     
-    this->frame_time_label = new QLabel("Frame time: 0.000ms/0.000ms (0.0%)");
+    this->frame_time_label = new QLabel("Frame time: 0.000ms/0.000ms (0.0%)", this);
+    auto* particle_number_label = new QLabel("Particle number:", this);
+    
+    // Line edits
+    
+    this->particle_number_line_edit = new QLineEdit("500", this);
+    this->particle_number_line_edit->setFixedWidth(50);
+    this->particle_number_line_edit->setValidator(new QIntValidator(1, 1000, this));
     
     // Push buttons
     
-    auto* reset_button = new QPushButton("Reset simulation");
-    this->toggle_button = new QPushButton("Resume simulation");
+    auto* reset_button = new QPushButton("Reset simulation", this);
+    this->toggle_button = new QPushButton("Resume simulation", this);
     
     // Renderer
     
     auto* renderer = new GasSimulatorRenderer(this);
+    
+    // Sliders
+    
+    this->particle_number_slider = new QSlider(Qt::Horizontal, this);
+    this->particle_number_slider->setTracking(true);
+    this->particle_number_slider->setRange(1, 1000);
+    this->particle_number_slider->setValue(500);
     
     /*
      * Layouts
@@ -131,6 +159,7 @@ void GasSimulatorWidget::initUI() {
     auto* level1_vbox0 = new QVBoxLayout();
     
     auto* level2_hbox0 = new QHBoxLayout();
+    auto* level2_hbox1 = new QHBoxLayout();
     
     /*
      * Strucutre
@@ -141,15 +170,23 @@ void GasSimulatorWidget::initUI() {
     
     level1_vbox0->addStretch(1);
     level1_vbox0->addLayout(level2_hbox0, 0);
+    level1_vbox0->addLayout(level2_hbox1, 0);
     level1_vbox0->addWidget(this->frame_time_label, 0);
     level1_vbox0->addStretch(1);
     
-    level2_hbox0->addWidget(this->toggle_button, 0);
-    level2_hbox0->addWidget(reset_button, 0);
+    level2_hbox0->addWidget(particle_number_label, 0);
+    level2_hbox0->addWidget(this->particle_number_slider, 1);
+    level2_hbox0->addWidget(this->particle_number_line_edit, 0);
+    
+    level2_hbox1->addWidget(this->toggle_button, 0);
+    level2_hbox1->addWidget(reset_button, 0);
     
     /*
      * Signals
      */
+    
+    QObject::connect(this->particle_number_line_edit, &QLineEdit::editingFinished, this, &GasSimulatorWidget::adjustParticleNumberSlider);
+    QObject::connect(this->particle_number_slider, &QSlider::valueChanged, this, &GasSimulatorWidget::adjustParticleNumberLineEdit);
     
     QObject::connect(reset_button, &QPushButton::clicked, renderer->getSimulator(), &GasSimulator::reset);
     QObject::connect(this->toggle_button, &QPushButton::clicked, this, &GasSimulatorWidget::toggleGasSimulatorButtonLabel);

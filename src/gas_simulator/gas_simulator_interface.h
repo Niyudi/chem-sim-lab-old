@@ -19,7 +19,9 @@
 #include <vector>
 
 #include <QLabel>
+#include <QLineEdit>
 #include <QPushButton>
+#include <QSlider>
 #include <QWidget>
 
 // Structs
@@ -52,13 +54,17 @@ class GasSimulatorWidget : public QWidget {
 public:
     GasSimulatorWidget(QWidget* parent = nullptr);
 public slots:
+    void adjustParticleNumberLineEdit();
+    void adjustParticleNumberSlider();
     void toggleGasSimulatorButtonLabel();
     void updateFrameTimeLabel(double frame_time, double max_frame_time);
 private:
     void initUI();
     
     QLabel* frame_time_label;
+    QLineEdit* particle_number_line_edit;
     QPushButton* toggle_button;
+    QSlider* particle_number_slider;
 };
 
 #endif /* GAS_SIMULATOR_INTERFACE_H */
