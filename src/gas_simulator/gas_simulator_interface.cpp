@@ -34,6 +34,7 @@ GasSimulatorRenderer::GasSimulatorRenderer(QWidget* parent) : QWidget(parent) {
     
     // Initiates gas simulator thread
     this->simulator = new GasSimulator(this);
+    QObject::connect(this->simulator, &GasSimulator::setRendererParticleNumber, this, &GasSimulatorRenderer::setParticleNumber);
     QObject::connect(this->simulator, &GasSimulator::particlesFrameResults, this, &GasSimulatorRenderer::update);
     QObject::connect(this->simulator, &GasSimulator::frameTimeData, (GasSimulatorWidget*) parent, &GasSimulatorWidget::updateFrameTimeLabel);
     QObject::connect(this->simulator, &GasSimulator::finished, this->simulator, &QObject::deleteLater);
@@ -77,19 +78,25 @@ void GasSimulatorRenderer::paintEvent(QPaintEvent* event) {
     painter.setBrush(brush);
     painter.setPen(pen);
     
-    for (auto it = this->particles_list.begin() ; it != this->particles_list.end() ; ++it) {
-        painter.drawEllipse(it->position[0], it->position[1], 2 * it->radius, 2 * it->radius);
+    for (short i = 0 ; i < this->particle_number ; ++i) {
+        painter.drawEllipse(this->particles_list[i].position[0], this->particles_list[i].position[1], 2 * this->particles_list[i].radius, 2 * this->particles_list[i].radius);
     }
 }
 
-void GasSimulatorRenderer::update(ParticleBody** particle_bodies_list, int particle_number) {
-    this->particles_list.clear();
+void GasSimulatorRenderer::setParticleNumber(int particle_number) {
+    this->particle_number = particle_number;
     
-    for (short i = 0 ; i < particle_number ; ++i) {
-        short adjusted_x = round(particle_bodies_list[i]->getPosition()[0] - particle_bodies_list[i]->getRadius());
-        short adjusted_y = round(particle_bodies_list[i]->getPosition()[1] - particle_bodies_list[i]->getRadius());
-        ParticleImage particle = {.position = {adjusted_x, adjusted_y}, .radius = round(particle_bodies_list[i]->getRadius())};
-        this->particles_list.push_back(particle);
+    delete this->particles_list;
+    this->particles_list = new ParticleImage [particle_number];
+}
+
+void GasSimulatorRenderer::update(ParticleBody** particle_bodies_list) {
+    for (short i = 0 ; i < this->particle_number ; ++i) {
+        double radius = particle_bodies_list[i]->getRadius();
+        short adjusted_x = round(particle_bodies_list[i]->getPosition()[0] - radius);
+        short adjusted_y = round(particle_bodies_list[i]->getPosition()[1] - radius);
+        ParticleImage particle = {.position = {adjusted_x, adjusted_y}, .radius = (short) round(radius)};
+        this->particles_list[i] = particle;
     }
     
     this->repaint();

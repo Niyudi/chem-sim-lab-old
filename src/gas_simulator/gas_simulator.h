@@ -3,8 +3,6 @@
 
 #include "../config.h"
 
-#include <vector>
-
 #include <QThread>
 
 // Forward declarations
@@ -30,15 +28,20 @@ protected:
 signals:
     void frameTimeData(double frame_time, double max_frame_time);
     void particlesFrameResults(ParticleBody** particle_bodies_list, int particle_number);
+    void setRendererParticleNumber(int particle_number);
 private:
     int particle_number = 500;
-    int new_particle_number = 500;
     ParticleBody** particles_list = new ParticleBody* [500];
     
+    // Thread safe holder variables
+    int new_particle_number = 500;
+    
+    // Flags
     bool active_flag = true;
     bool reset_flag = true;
     bool running_flag = false;
     
+    // Frame time variables
     double acumulated_frame_time = 0.0;
     
     unsigned long frame_count = 1;

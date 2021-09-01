@@ -28,6 +28,7 @@ int GasSimulator::exec() {
         
         if (this->reset_flag) { // Randomizes new particles_list
             this->particle_number = this->new_particle_number;
+            this->setRendererParticleNumber(this->particle_number);
             
             delete this->particles_list;
             this->particles_list = new ParticleBody* [this->particle_number];
@@ -51,7 +52,6 @@ int GasSimulator::exec() {
             }
             
             // Detects and resolves collisions
-            
             for (short i1 = 0 ; i1 < this->particle_number - 1 ; ++i1) {
                 for (short i2 = i1 + 1 ; i2 < this->particle_number ; ++i2) {
                     // Calculates distance
@@ -83,7 +83,7 @@ int GasSimulator::exec() {
             this->acumulated_frame_time = 0.0;
         }
         
-        float delta = this->MAX_FRAME_TIME - frame_time; // Calculates difference between max frame time vs frame time
+        double delta = this->MAX_FRAME_TIME - frame_time; // Calculates difference between max frame time vs frame time
         if (delta > 0) { // Sleeps for excess time
             std::this_thread::sleep_for(std::chrono::duration<double, std::ratio<1, 1000>>(delta));
         }

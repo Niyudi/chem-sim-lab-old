@@ -26,12 +26,15 @@ public:
     GasSimulatorRenderer(QWidget* parent = nullptr);
     
     GasSimulator* getSimulator() const;
+    
 public slots:
-    void update(ParticleBody** particle_bodies_list, int particle_number);
+    void setParticleNumber(int particle_number);
+    void update(ParticleBody** particle_bodies_list);
 protected:
     void paintEvent(QPaintEvent* event);
 private:
-    std::vector<ParticleImage> particles_list;
+    int particle_number = 500;
+    ParticleImage* particles_list = new ParticleImage [500];
     
     GasSimulator* simulator;
 };
