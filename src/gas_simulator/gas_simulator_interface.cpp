@@ -112,6 +112,14 @@ GasSimulatorWidget::GasSimulatorWidget(QWidget* parent) : QWidget(parent) {
     this->initUI();
 }
 
+void GasSimulatorWidget::adjustInitialSpeedLineEdit() {
+    this->initial_speed_line_edit->setText(QString::number(this->initial_speed_slider->value()));
+}
+
+void GasSimulatorWidget::adjustInitialSpeedSlider() {   
+    this->initial_speed_slider->setValue(this->initial_speed_line_edit->text().toInt());
+}
+
 void GasSimulatorWidget::adjustParticleNumberLineEdit() {
     this->particle_number_line_edit->setText(QString::number(this->particle_number_slider->value()));
 }
@@ -129,7 +137,7 @@ void GasSimulatorWidget::adjustRadiusSlider() {
 }
 
 void GasSimulatorWidget::gatherResetData() {
-    this->sendResetData(this->particle_number_slider->value(), this->radius_slider->value() / 100.0);
+    this->sendResetData(this->particle_number_slider->value(), this->radius_slider->value() / 100.0, this->initial_speed_slider->value() / 100.0);
 }
 
 void GasSimulatorWidget::initUI() {
@@ -141,20 +149,26 @@ void GasSimulatorWidget::initUI() {
     
     this->frame_time_label = new QLabel("Frame time: 0.000ms/0.000ms (0.0%)", this);
     
+    auto* initial_speed_label = new QLabel("Initial speed:", this);
     auto* particle_number_label = new QLabel("Particle number:", this);
     auto* radius_label = new QLabel("Radius:", this);
     
     // Line edits
     
+    this->initial_speed_line_edit = new QLineEdit("50", this);
+    this->initial_speed_line_edit->setValidator(new QIntValidator(1, 100, this));
+    this->initial_speed_line_edit->setAlignment(Qt::AlignRight);
+    this->initial_speed_line_edit->setFixedWidth(46);
+    
     this->particle_number_line_edit = new QLineEdit("500", this);
     this->particle_number_line_edit->setValidator(new QIntValidator(1, 1000, this));
     this->particle_number_line_edit->setAlignment(Qt::AlignRight);
-    this->particle_number_line_edit->setFixedWidth(50);
+    this->particle_number_line_edit->setFixedWidth(46);
     
-    this->radius_line_edit = new QLineEdit("300", this);
+    this->radius_line_edit = new QLineEdit("500", this);
     this->radius_line_edit->setValidator(new QIntValidator(100, 1000, this));
     this->radius_line_edit->setAlignment(Qt::AlignRight);
-    this->radius_line_edit->setFixedWidth(50);
+    this->radius_line_edit->setFixedWidth(46);
     
     // Push buttons
     
@@ -167,6 +181,11 @@ void GasSimulatorWidget::initUI() {
     
     // Sliders
     
+    this->initial_speed_slider = new QSlider(Qt::Horizontal, this);
+    this->initial_speed_slider->setTracking(true);
+    this->initial_speed_slider->setRange(1, 100);
+    this->initial_speed_slider->setValue(50);
+    
     this->particle_number_slider = new QSlider(Qt::Horizontal, this);
     this->particle_number_slider->setTracking(true);
     this->particle_number_slider->setRange(1, 1000);
@@ -175,7 +194,7 @@ void GasSimulatorWidget::initUI() {
     this->radius_slider = new QSlider(Qt::Horizontal, this);
     this->radius_slider->setTracking(true);
     this->radius_slider->setRange(100, 1000);
-    this->radius_slider->setValue(300);
+    this->radius_slider->setValue(500);
     
     /*
      * Layouts
@@ -190,6 +209,7 @@ void GasSimulatorWidget::initUI() {
     auto* level2_hbox0 = new QHBoxLayout();
     auto* level2_hbox1 = new QHBoxLayout();
     auto* level2_hbox2 = new QHBoxLayout();
+    auto* level2_hbox3 = new QHBoxLayout();
     
     /*
      * Strucutre
@@ -202,6 +222,7 @@ void GasSimulatorWidget::initUI() {
     level1_vbox0->addLayout(level2_hbox0, 0);
     level1_vbox0->addLayout(level2_hbox1, 0);
     level1_vbox0->addLayout(level2_hbox2, 0);
+    level1_vbox0->addLayout(level2_hbox3, 0);
     level1_vbox0->addWidget(this->frame_time_label, 0);
     level1_vbox0->addStretch(1);
     
@@ -213,8 +234,12 @@ void GasSimulatorWidget::initUI() {
     level2_hbox1->addWidget(this->radius_slider, 1);
     level2_hbox1->addWidget(this->radius_line_edit, 0);
     
-    level2_hbox2->addWidget(this->toggle_button, 0);
-    level2_hbox2->addWidget(reset_button, 0);
+    level2_hbox2->addWidget(initial_speed_label, 0);
+    level2_hbox2->addWidget(this->initial_speed_slider, 1);
+    level2_hbox2->addWidget(this->initial_speed_line_edit, 0);
+    
+    level2_hbox3->addWidget(this->toggle_button, 0);
+    level2_hbox3->addWidget(reset_button, 0);
     
     /*
      * Signals
@@ -225,6 +250,9 @@ void GasSimulatorWidget::initUI() {
     
     QObject::connect(this->radius_line_edit, &QLineEdit::editingFinished, this, &GasSimulatorWidget::adjustRadiusSlider);
     QObject::connect(this->radius_slider, &QSlider::valueChanged, this, &GasSimulatorWidget::adjustRadiusLineEdit);
+    
+    QObject::connect(this->initial_speed_line_edit, &QLineEdit::editingFinished, this, &GasSimulatorWidget::adjustInitialSpeedSlider);
+    QObject::connect(this->initial_speed_slider, &QSlider::valueChanged, this, &GasSimulatorWidget::adjustInitialSpeedLineEdit);
     
     QObject::connect(reset_button, &QPushButton::clicked, this, &GasSimulatorWidget::gatherResetData);
     QObject::connect(this->toggle_button, &QPushButton::clicked, this, &GasSimulatorWidget::toggleGasSimulatorButtonLabel);

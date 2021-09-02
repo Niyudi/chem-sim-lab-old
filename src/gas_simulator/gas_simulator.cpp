@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <iterator>
+#define _USE_MATH_DEFINES
 #include <math.h>
 #include <stdlib.h>
 #include <thread>
@@ -34,9 +35,14 @@ int GasSimulator::exec() {
             this->particles_list = new ParticleBody* [this->particle_number];
             
             for (short i = 0 ; i < this->particle_number ; ++i) {
-                double* position = new double[2] { rand() / (RAND_MAX / GAS_SIMULATOR_WIDTH), rand() / (RAND_MAX / GAS_SIMULATOR_HEIGHT)};
-                double* velocity = new double[2] { -0.1 + (rand() / (RAND_MAX / (0.2))), -0.1 + (rand() / (RAND_MAX / (0.2)))};
-                this->particles_list[i] = new ParticleBody(position, 1.43, this->radius, velocity);
+                // Randomises position within the box
+                double* position = new double[2] {this->radius + (rand() * (GAS_SIMULATOR_WIDTH - (2 * this->radius)) / RAND_MAX), this->radius + (rand() * (GAS_SIMULATOR_HEIGHT - (2 * this->radius)) / RAND_MAX)};
+                
+                // Randomizes velocity with the apropriate speed
+                double angle = rand() * (2 * M_PI) / RAND_MAX;
+                double* velocity = new double[2] {this->initial_speed * cos(angle), this->initial_speed * sin(angle)};
+                
+                this->particles_list[i] = new ParticleBody(position, 1.0, this->radius, velocity);
             }
             
             this->acumulated_frame_time = 0.0;
@@ -96,9 +102,11 @@ void GasSimulator::kill() {
     this->wait();
 }
 
-void GasSimulator::reset(int particle_number, double radius) {
-    this->new_particle_number = particle_number; // Changes particle number
-    this->radius = radius; // Changes particle number
+void GasSimulator::reset(int particle_number, double radius, double initial_speed) {
+    this->new_particle_number = particle_number; // Changes particle number (thread safe)
+    
+    this->initial_speed = initial_speed; // Changes intial speed
+    this->radius = radius; // Changes radius
     
     this->reset_flag = true;
 }
@@ -143,9 +151,7 @@ double* ParticleBody::getVelocity() const {
 }
 
 void ParticleBody::solveCollision(ParticleBody* particle, double normal_x, double normal_y, double distance) {
-    // Gets some data
-    double inverse_mass = this->inverse_mass;
-    double inverse_other_mass = particle->getInverseMass();
+    // Gets other velocity
     double* other_velocity = particle->getVelocity();
     
     // Normalizes normal
@@ -163,6 +169,10 @@ void ParticleBody::solveCollision(ParticleBody* particle, double normal_x, doubl
     if (velocity_along_normal > 0) {
         return;
     }
+    
+    // Gets masses
+    double inverse_mass = this->inverse_mass;
+    double inverse_other_mass = particle->getInverseMass();
     
     // Calculates magnitude of impulse
     double impulse_scalar = (-2 * velocity_along_normal) / (inverse_mass + inverse_other_mass);

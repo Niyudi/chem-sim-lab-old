@@ -42,6 +42,8 @@ class GasSimulatorWidget : public QWidget {
 public:
     GasSimulatorWidget(QWidget* parent = nullptr);
 public slots:
+    void adjustInitialSpeedLineEdit();
+    void adjustInitialSpeedSlider();
     void adjustParticleNumberLineEdit();
     void adjustParticleNumberSlider();
     void adjustRadiusLineEdit();
@@ -50,17 +52,19 @@ public slots:
     void toggleGasSimulatorButtonLabel();
     void updateFrameTimeLabel(double frame_time, double max_frame_time);
 signals:
-    void sendResetData(int particle_number, double radius);
+    void sendResetData(int particle_number, double radius, double initial_speed);
 private:
     void initUI();
     
     QLabel* frame_time_label;
     
+    QLineEdit* initial_speed_line_edit;
     QLineEdit* particle_number_line_edit;
     QLineEdit* radius_line_edit;
     
     QPushButton* toggle_button;
     
+    QSlider* initial_speed_slider;
     QSlider* particle_number_slider;
     QSlider* radius_slider;
 };
