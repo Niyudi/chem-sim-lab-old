@@ -15,6 +15,20 @@
  * Classes
  */
 
+// HomePage
+
+HomePage::HomePage(QWidget* parent) : QWidget(parent) {
+    auto* level0_hbox0 = new QHBoxLayout(this);
+    level0_hbox0->setContentsMargins(0, 0, 0, 0);
+    level0_hbox0->setSpacing(0);
+    
+    auto* label = new QLabel("Welcome!", this);
+    
+    level0_hbox0->addStretch(1);
+    level0_hbox0->addWidget(label, 0);
+    level0_hbox0->addStretch(1);
+}
+
 // MainWindow
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
@@ -61,18 +75,4 @@ void MainWindow::openGasSimulator() {
         delete this->centralWidget();
         this->setCentralWidget(new GasSimulatorWidget(this));
     }
-}
-
-// HomePage
-
-HomePage::HomePage(QWidget* parent) : QWidget(parent) {
-    auto* level0_hbox0 = new QHBoxLayout(this);
-    level0_hbox0->setContentsMargins(0, 0, 0, 0);
-    level0_hbox0->setSpacing(0);
-    
-    auto* label = new QLabel("Welcome!", this);
-    
-    level0_hbox0->addStretch(1);
-    level0_hbox0->addWidget(label, 0);
-    level0_hbox0->addStretch(1);
 }
