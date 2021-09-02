@@ -3,7 +3,6 @@
 #include <ctime>
 
 #include <QApplication>
-#include <QMainWindow>
 
 int main(int argc, char* argv[]) {
     // initialize resources, if needed
