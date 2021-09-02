@@ -3,6 +3,8 @@
 
 #include "gas_simulator.h"
 
+#include <string>
+
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
@@ -50,7 +52,7 @@ public slots:
     void adjustRadiusSlider();
     void gatherResetData();
     void toggleGasSimulatorButtonLabel();
-    void updateFrameTimeLabel(double frame_time, double max_frame_time);
+    void updateFrameTimeLabel(double frame_time);
 signals:
     void sendResetData(int particle_number, double radius, double initial_speed);
 private:
@@ -67,6 +69,8 @@ private:
     QSlider* initial_speed_slider;
     QSlider* particle_number_slider;
     QSlider* radius_slider;
+    
+    std::string MAX_FRAME_TIME_text;
 };
 
 #endif /* GAS_SIMULATOR_INTERFACE_H */

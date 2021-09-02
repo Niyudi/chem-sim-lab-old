@@ -108,7 +108,14 @@ void GasSimulatorRenderer::update(ParticleBody** particle_bodies_list) {
 
 // GasSimulatorWidget
 
-GasSimulatorWidget::GasSimulatorWidget(QWidget* parent) : QWidget(parent) {   
+GasSimulatorWidget::GasSimulatorWidget(QWidget* parent) : QWidget(parent) {  
+    // Stores MAX_FRAME_TIME as string for display
+    std::ostringstream MAX_FRAME_TIME_stream;
+    MAX_FRAME_TIME_stream.precision(3);
+    MAX_FRAME_TIME_stream << std::fixed << MAX_FRAME_TIME;
+    this->MAX_FRAME_TIME_text = MAX_FRAME_TIME_stream.str();
+    
+    // Initializes UI
     this->initUI();
 }
 
@@ -147,7 +154,7 @@ void GasSimulatorWidget::initUI() {
     
     // Labels
     
-    this->frame_time_label = new QLabel("Frame time: 0.000ms/0.000ms (0.0%)", this);
+    this->frame_time_label = new QLabel(QString::fromStdString("Frame time: 0.000ms/" + this->MAX_FRAME_TIME_text + "ms (0.0%)"), this);
     
     auto* initial_speed_label = new QLabel("Initial speed:", this);
     auto* particle_number_label = new QLabel("Particle number:", this);
@@ -269,16 +276,14 @@ void GasSimulatorWidget::toggleGasSimulatorButtonLabel() {
     }
 }
 
-void GasSimulatorWidget::updateFrameTimeLabel(double frame_time, double max_frame_time) {
-    double time_usage = frame_time / max_frame_time * 100;
+void GasSimulatorWidget::updateFrameTimeLabel(double frame_time) {
+    double time_usage = frame_time / MAX_FRAME_TIME * 100;
     
-    std::ostringstream frame_time_stream, max_frame_time_stream, time_usage_stream;
+    std::ostringstream frame_time_stream, time_usage_stream;
     frame_time_stream.precision(3);
-    max_frame_time_stream.precision(3);
     time_usage_stream.precision(1);
     frame_time_stream << std::fixed << frame_time;
-    max_frame_time_stream << std::fixed << max_frame_time;
     time_usage_stream << std::fixed << time_usage;
     
-    this->frame_time_label->setText(QString::fromStdString("Frame time: " + frame_time_stream.str() + "ms/" + max_frame_time_stream.str() + "ms (" + time_usage_stream.str() + "%)"));
+    this->frame_time_label->setText(QString::fromStdString("Frame time: " + frame_time_stream.str() + "ms/" + this->MAX_FRAME_TIME_text + "ms (" + time_usage_stream.str() + "%)"));
 }

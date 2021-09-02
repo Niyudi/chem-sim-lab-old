@@ -1,8 +1,6 @@
 #ifndef GAS_SIMULATOR_H
 #define GAS_SIMULATOR_H
 
-#include "../config.h"
-
 #include <QThread>
 
 // Forward declarations
@@ -26,7 +24,7 @@ protected:
     
     int exec();
 signals:
-    void frameTimeData(double frame_time, double max_frame_time);
+    void frameTimeData(double frame_time);
     void particlesFrameResults(ParticleBody** particle_bodies_list, int particle_number);
     void setRendererParticleNumber(int particle_number);
 private:
@@ -48,8 +46,6 @@ private:
     double acumulated_frame_time = 0.0;
     
     unsigned long frame_count = 1;
-    
-    static constexpr double MAX_FRAME_TIME = (1.0 / FPS) * 1000.0;
 };
 
 class ParticleBody {

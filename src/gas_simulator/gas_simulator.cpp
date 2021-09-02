@@ -1,5 +1,7 @@
 #include "gas_simulator.h"
 
+#include "../config.h"
+
 #include <chrono>
 #include <iterator>
 #define _USE_MATH_DEFINES
@@ -54,7 +56,7 @@ int GasSimulator::exec() {
         if (this->running_flag) { // Calculates physics for one frame
             // Updates all positions based on velocities for one frame
             for (short i = 0 ; i < this->particle_number ; ++i) {
-                this->particles_list[i]->update(this->MAX_FRAME_TIME);
+                this->particles_list[i]->update(MAX_FRAME_TIME);
             }
             
             // Detects and resolves collisions
@@ -84,12 +86,12 @@ int GasSimulator::exec() {
         double frame_time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() / 1000.0; // Calculates frame time in milliseconds
         
         this->acumulated_frame_time += frame_time;
-        if (this->frame_count % 50 == 0) {
-            this->frameTimeData(this->acumulated_frame_time / 50.0, this->MAX_FRAME_TIME); // Emits frame time data signal to widget
+        if (this->frame_count % FPS == 0) {
+            this->frameTimeData(this->acumulated_frame_time / FPS); // Emits frame time data signal to widget
             this->acumulated_frame_time = 0.0;
         }
         
-        double delta = this->MAX_FRAME_TIME - frame_time; // Calculates difference between max frame time vs frame time
+        double delta = MAX_FRAME_TIME - frame_time; // Calculates difference between max frame time vs frame time
         if (delta > 0) { // Sleeps for excess time
             std::this_thread::sleep_for(std::chrono::duration<double, std::ratio<1, 1000>>(delta));
         }
